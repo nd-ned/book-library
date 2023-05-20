@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.18;
 
-// import "./Ownable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 
@@ -44,10 +43,12 @@ contract BookLibrary is Ownable {
         require(hasBorrowed(msg.sender, id), "You haven't borrowed this book");
 
         book.numBorrowed--;
-        removeBorrower(book, msg.sender);
+        removeBorrower(id, msg.sender);
     }
 
-    function hasBorrowed(address borrower, uint id) private view returns(bool) {
+    // Temporary make the function public for testing
+    // function hasBorrowed(address borrower, uint id) private view returns(bool) {
+    function hasBorrowed(address borrower, uint id) public view returns(bool) {
         Book storage book = books[id];
         for (uint i = 0; i < book.borrowers.length; i++) {
             if (book.borrowers[i] == borrower) {
@@ -57,7 +58,10 @@ contract BookLibrary is Ownable {
         return false;
     }
 
-    function removeBorrower(Book storage book, address borrower) private {
+    // Temporary make the function public for testing
+    // function removeBorrower(Book storage book, address borrower) private {
+    function removeBorrower(uint bookId, address borrower) public {
+        Book storage book = books[bookId];
         for (uint i = 0; i < book.borrowers.length; i++) {
             if (book.borrowers[i] == borrower) {
                 book.borrowers[i] = book.borrowers[book.borrowers.length - 1];
