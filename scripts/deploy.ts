@@ -1,6 +1,6 @@
 import { ethers } from "hardhat"
 
-async function main() {
+export async function main() {
   const BookLibrary = await ethers.getContractFactory("BookLibrary")
   const bookLibrary = await BookLibrary.deploy()
 
