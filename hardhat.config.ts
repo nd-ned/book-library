@@ -19,7 +19,13 @@ const config: HardhatUserConfig = {
       url: process.env.MUMBAI_RPC_URL,
       chainId: 80001,
       accounts: [process.env.ACCOUNT_PRIVATE_KEY as string],
-    }
+    },
+    hardhat: {
+      allowUnlimitedContractSize: true,
+    },
+    localhost: {
+      allowUnlimitedContractSize: true,
+    },
   },
 };
 
@@ -53,5 +59,21 @@ task("deploy-and-verify", "Deploys BookLibrary contract to Goerli and verifies i
     const { main } = await lazyImport("./scripts/deploy-and-verify")
     await main()
   })
+
+task("interact", "Interact with BookLibrary contract")
+  .addParam("contractNetwork", "Please provide the network name [localhost, mumbai]")
+  .addParam("contractAddress", "Please provide the contract address")
+  .setAction(async ({ contractNetwork, contractAddress }) => {
+    console.log("contractNetwork", contractNetwork)
+
+
+    if (["localhost", "mumbai"].indexOf(contractNetwork) === -1) {
+      throw new Error("Please provide the contract-network name [localhost, mumbai]");
+    }
+
+    const { main } = await lazyImport("./interface/interact");
+
+    await main({network: contractNetwork, contractAddress});
+  });
 
 export default config;

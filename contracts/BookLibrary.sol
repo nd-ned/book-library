@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 error Unauthorized();
 
 contract BookLibrary is Ownable {
-    uint currBookId = 1;
+    uint public currBookId = 1;
 
     struct Book {
         uint id;
@@ -17,7 +17,7 @@ contract BookLibrary is Ownable {
 
     mapping (uint => Book) public books;
     mapping (uint => address[]) public bookBorrowers;
-    mapping (uint => mapping (address => bool)) private borrowerMapping;
+    mapping (uint => mapping (address => bool)) public borrowerMapping;
 
     function addBook(string memory title, uint numCopies) public onlyOwner {
         Book memory newBook = Book(currBookId, title, numCopies, 0);
