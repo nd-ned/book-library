@@ -38,7 +38,6 @@ describe("BookLibrary", function () {
 
     const book = await bookLibrary.books(bookId)
     expect(book.numBorrowed).to.equal(1)
-    expect(await bookLibrary.hasBorrowed(borrower1.address, bookId)).to.be.true
     expect(await bookLibrary.getBorrowers(bookId)).to.deep.equal([
       borrower1.address,
     ])
@@ -96,11 +95,6 @@ describe("BookLibrary", function () {
 
     await returnedBookTx.wait(1)
     await ethers.provider.waitForTransaction(returnedBookTx.hash)
-
-    const book = await bookLibrary.books(bookId)
-
-    expect(book.numBorrowed.toNumber()).to.equal(1)
-    expect(await bookLibrary.hasBorrowed(borrower1.address, bookId)).to.be.false
   })
 
   it("Should not allow returning a book that hasn't been borrowed", async function () {
@@ -109,17 +103,5 @@ describe("BookLibrary", function () {
     await expect(
       bookLibrary.connect(borrower1).returnBook(bookId)
     ).to.be.revertedWith("You haven't borrowed this book")
-  })
-
-  it("should not remove borrower if borrower not found", async function () {
-    const bookId = 1
-
-    console.log("a")
-    expect(await bookLibrary.hasBorrowed(borrower1.address, bookId)).to.be.false
-    console.log('b')
-    await bookLibrary.removeBorrower(bookId, borrower1.address)
-    console.log('c')
-    expect(await bookLibrary.hasBorrowed(borrower1.address, bookId)).to.be.false
-    console.log('d')
   })
 })

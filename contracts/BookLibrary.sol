@@ -42,19 +42,7 @@ contract BookLibrary is Ownable {
         require(borrowerMapping[id][msg.sender], "You haven't borrowed this book");
 
         book.numBorrowed--;
-        removeBorrower(id, msg.sender);
-    }
-
-    // Temporary make the function public for testing
-    // function hasBorrowed(address borrower, uint id) private view returns(bool) {
-    function hasBorrowed(address borrower, uint id) public view returns(bool) {
-        return borrowerMapping[id][borrower];
-    }
-
-    // Temporary make the function public for testing
-    // function removeBorrower(Book storage book, address borrower) private {
-    function removeBorrower(uint id, address borrower) public {
-        borrowerMapping[id][borrower] = false;
+        borrowerMapping[id][msg.sender] = false;
     }
 
     function getBorrowers(uint id) public view returns(address[] memory) {
