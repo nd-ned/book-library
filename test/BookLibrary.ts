@@ -79,7 +79,6 @@ describe("BookLibrary", function () {
     ).to.be.revertedWith("This book doesn't exist")
   })
 
-
   it("Should not return a non-existent book", async function () {
     const bookId = 2
 
@@ -113,10 +112,14 @@ describe("BookLibrary", function () {
   })
 
   it("should not remove borrower if borrower not found", async function () {
-    const bookId = 1;
-    
-    expect(await bookLibrary.hasBorrowed(borrower1.address, bookId)).to.be.false;
-    await bookLibrary.removeBorrower(bookId, borrower1.address);
-    expect(await bookLibrary.hasBorrowed(borrower1.address, bookId)).to.be.false;
-  });
+    const bookId = 1
+
+    console.log("a")
+    expect(await bookLibrary.hasBorrowed(borrower1.address, bookId)).to.be.false
+    console.log('b')
+    await bookLibrary.removeBorrower(bookId, borrower1.address)
+    console.log('c')
+    expect(await bookLibrary.hasBorrowed(borrower1.address, bookId)).to.be.false
+    console.log('d')
+  })
 })

@@ -3,7 +3,6 @@ pragma solidity ^0.8.7;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-
 error Unauthorized();
 
 contract BookLibrary is Ownable {
@@ -14,14 +13,14 @@ contract BookLibrary is Ownable {
         string title;
         uint numCopies;
         uint numBorrowed;
-        address[] borrowers;
     }
 
     mapping (uint => Book) public books;
     mapping (uint => address[]) public bookBorrowers;
+    mapping (uint => mapping (address => bool)) private borrowerMapping;
 
     function addBook(string memory title, uint numCopies) public onlyOwner {
-        Book memory newBook = Book(currBookId, title, numCopies, 0, new address[](0));
+        Book memory newBook = Book(currBookId, title, numCopies, 0);
         books[currBookId] = newBook;
         currBookId++;
     }
@@ -30,17 +29,17 @@ contract BookLibrary is Ownable {
         Book storage book = books[id];
         require(book.id != 0, "This book doesn't exist");
         require(book.numBorrowed < book.numCopies, "There are no available copies of this book");
-        require(!hasBorrowed(msg.sender, id), "You have already borrowed this book");
+        require(!borrowerMapping[id][msg.sender], "You have already borrowed this book");
 
         book.numBorrowed++;
-        book.borrowers.push(msg.sender);
         bookBorrowers[id].push(msg.sender);
+        borrowerMapping[id][msg.sender] = true;
     }
 
     function returnBook(uint id) public {
         Book storage book = books[id];
         require(book.id != 0, "This book doesn't exist");
-        require(hasBorrowed(msg.sender, id), "You haven't borrowed this book");
+        require(borrowerMapping[id][msg.sender], "You haven't borrowed this book");
 
         book.numBorrowed--;
         removeBorrower(id, msg.sender);
@@ -49,26 +48,13 @@ contract BookLibrary is Ownable {
     // Temporary make the function public for testing
     // function hasBorrowed(address borrower, uint id) private view returns(bool) {
     function hasBorrowed(address borrower, uint id) public view returns(bool) {
-        Book storage book = books[id];
-        for (uint i = 0; i < book.borrowers.length; i++) {
-            if (book.borrowers[i] == borrower) {
-                return true;
-            }
-        }
-        return false;
+        return borrowerMapping[id][borrower];
     }
 
     // Temporary make the function public for testing
     // function removeBorrower(Book storage book, address borrower) private {
-    function removeBorrower(uint bookId, address borrower) public {
-        Book storage book = books[bookId];
-        for (uint i = 0; i < book.borrowers.length; i++) {
-            if (book.borrowers[i] == borrower) {
-                book.borrowers[i] = book.borrowers[book.borrowers.length - 1];
-                book.borrowers.pop();
-                return;
-            }
-        }
+    function removeBorrower(uint id, address borrower) public {
+        borrowerMapping[id][borrower] = false;
     }
 
     function getBorrowers(uint id) public view returns(address[] memory) {
